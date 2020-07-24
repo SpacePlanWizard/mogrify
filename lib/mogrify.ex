@@ -28,7 +28,7 @@ defmodule Mogrify do
     output_path = output_path_for(image, opts)
     create_folder_if_doesnt_exist!(output_path)
 
-    cmd_mogrify(arguments_for_saving(image, output_path), stderr_to_stdout: true)
+    cmd_mogrify(arguments_for_saving(image, output_path, opts), stderr_to_stdout: true)
     image_after_command(image, output_path)
   end
 
@@ -144,8 +144,13 @@ defmodule Mogrify do
     end
   end
 
-  defp arguments_for_saving(image, path) do
-    base_arguments = ["-write", path, image.path]
+  defp arguments_for_saving(image, path, opts \\ []) do
+    base_arguments =
+    if Keyword.get(opts, :no_write_command) do
+      [image.path]
+    else
+      ["-write", path, image.path]
+    end
     arguments(image) ++ base_arguments
   end
 
@@ -409,3 +414,4 @@ defmodule Mogrify do
     path |> Path.dirname() |> File.mkdir_p!()
   end
 end
+
